@@ -25,7 +25,7 @@
 # 
 # Consider your entire calibration document. What is the sum of all of the calibration values?
 
-INPUT_FILE = r'day_01_A_input.txt'
+INPUT_FILE = r'day_01_input.txt'
 
 with open(INPUT_FILE) as calibrationData:
 	sum = 0
