@@ -39,12 +39,12 @@ def gameIsPossible(gameData, redTotal=0, greenTotal=0, blueTotal=0):
 	for roundData in roundList:
 		# roundData format example:
 		#	1 green, 3 red, 6 blue
-		gemList = roundData.split(', ')
+		cubeList = roundData.split(', ')
 		
-		for gemData in gemList:
-			# gemData format example:
+		for cubeData in cubeList:
+			# cubeData format example:
 			#	15 blue
-			amount, color = gemData.split()
+			amount, color = cubeData.split()
 			print(f"amount & color:   {amount} {color}")
 
 			match color:
@@ -55,9 +55,9 @@ def gameIsPossible(gameData, redTotal=0, greenTotal=0, blueTotal=0):
 				case 'blue':
 					total = blueTotal
 				case _:
-					raise ValueError(f"Gem color {color} unrecognized or improperly formatted.")
+					raise ValueError(f"Cube color {color} unrecognized or improperly formatted.")
 
-			# more gems of a color pulled from the pouch than gems of that color in the pouch = impossible
+			# more cubes of a color pulled from the pouch than cubes of that color in the pouch = impossible
 			if int(amount) > total:
 				return False
 
