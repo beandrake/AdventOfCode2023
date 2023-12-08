@@ -59,7 +59,7 @@ with open(INPUT_FILE) as dataRows:
 		winningNumbers = [int(num) for num in winningNumbers]
 		ownedNumbers = [int(num) for num in ownedNumbers]
 		
-		# sort both lists of numbers so that we can match with an n alrogithm instead of n-squared
+		# sort both lists of numbers so that we can match with an n alrogithm instead of n-squared (granted, the sorts themselves - Timsort - will be around n log n)
 		winningNumbers.sort()
 		ownedNumbers.sort()		
 		print(f"Winning: {winningNumbers}")
