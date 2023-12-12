@@ -177,6 +177,8 @@ with open(INPUT_FILE, 'r') as dataRows:
 				continue
 			
 			# We have legitimate values to get, so parse them to ints
+			# Example:
+			# 	52 50 48
 			firstDestinationValue, firstSourceValue, valueRange = [int(numericString) for numericString in numberList]
 			lastSourceValue = firstSourceValue + valueRange - 1
 			lastDestinationValue = firstDestinationValue + valueRange - 1
@@ -213,3 +215,4 @@ with open(INPUT_FILE, 'r') as dataRows:
 			lowestValue = seed.getValue()
 
 	print(f"The lowest value is {lowestValue}")
+	input()

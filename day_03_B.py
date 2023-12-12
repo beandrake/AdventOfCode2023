@@ -144,3 +144,4 @@ with open(INPUT_FILE) as dataRows:
 	print(f"Running total: {gearSum}\n")
 
 	print(f"Final total:   {gearSum}")
+	input()

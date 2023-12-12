@@ -131,3 +131,4 @@ with open(INPUT_FILE, 'r') as dataRows:
 	print(f"{cardAmountList.listOfAmounts}\n")	
 	print(f"Length of list: {cardAmountList.getLength()}")
 	print(f"Total cards possessed:   {cardAmountList.getTotalSum()}")
+	input()

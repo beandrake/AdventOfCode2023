@@ -114,3 +114,4 @@ if __name__ == '__main__':
 			print(f"{lineValue} --> running total: {sum}", end='\n\n')
 
 		print(f"Sum of all calibration values: {sum}")
+		input()

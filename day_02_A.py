@@ -80,6 +80,7 @@ with open(INPUT_FILE) as dataRows:
 
 		print(f"Running total: {sum}\n")
 	print(f"Final total  : {sum}")
+	input()
 
 		
 		

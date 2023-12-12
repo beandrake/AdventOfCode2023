@@ -59,3 +59,4 @@ with open(INPUT_FILE) as calibrationData:
 		print(f"{lineValue} --> running total: {sum}", end='\n\n')
 
 	print(f"Sum of all calibration values: {sum}")
+	input()

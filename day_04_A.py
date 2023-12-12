@@ -90,3 +90,4 @@ with open(INPUT_FILE) as dataRows:
 		print(f"Running total: {pointSum}\n")
 
 	print(f"Final total:   {pointSum}")
+	input()
