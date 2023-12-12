@@ -68,7 +68,7 @@ with open(INPUT_FILE, 'r') as dataRows:
 		timeLimit = int( raceTimeLimits[raceNumber] )
 		distanceRecord = int( raceDistanceRecords[raceNumber] )
 
-		# NOTE: The below is a brute force technique that works great for a manual run because there are few numbers and they're pretty small
+		# NOTE: The below is a brute force technique that is easy to read/understand; it works great for our needs because there are so few numbers and they're pretty small.
 		#		However, if performance became an issue, we would want to implement this as a binary search.
 		#		There's also no need to search both the early and late values, since 5*7 and 7*5 will give the same result.
 		# 		Thus, we can just double the amount of wins found in timeLimit//2, as long as we carefully handle the middle value if the timeLimit is odd.
