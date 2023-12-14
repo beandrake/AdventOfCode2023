@@ -1,4 +1,4 @@
-# https://adventofcode.com/2023/day/7
+# https://adventofcode.com/2023/day/7#part2
 
 # --- Day 7: Camel Cards ---
 # 
@@ -56,6 +56,30 @@
 # 
 # Find the rank of every hand in your set. What are the total winnings?
 
+# --- Part Two ---
+# 
+# To make things a little more interesting, the Elf introduces one additional rule. Now, J cards are jokers - wildcards that can act like whatever card would make the hand the strongest type possible.
+# 
+# To balance this, J cards are now the weakest individual cards, weaker even than 2. The other cards stay in the same order: A, K, Q, T, 9, 8, 7, 6, 5, 4, 3, 2, J.
+# 
+# J cards can pretend to be whatever card is best for the purpose of determining hand type; for example, QJJQ2 is now considered four of a kind. However, for the purpose of breaking ties between two hands of the same type, J is always treated as J, not the card it's pretending to be: JKKK2 is weaker than QQQQ2 because J is weaker than Q.
+# 
+# Now, the above example goes very differently:
+# 
+# 32T3K 765
+# T55J5 684
+# KK677 28
+# KTJJT 220
+# QQQJA 483
+# 
+#     32T3K is still the only one pair; it doesn't contain any jokers, so its strength doesn't increase.
+#     KK677 is now the only two pair, making it the second-weakest hand.
+#     T55J5, KTJJT, and QQQJA are now all four of a kind! T55J5 gets rank 3, QQQJA gets rank 4, and KTJJT gets rank 5.
+# 
+# With the new joker rule, the total winnings in this example are 5905.
+# 
+# Using the new joker rule, find the rank of every hand in your set. What are the new total winnings?
+
 
 INPUT_FILE = r'day_07_input.txt'
 #INPUT_FILE = r'day_07_miniTest.txt'
@@ -67,7 +91,7 @@ CARD_VALUES = {
 	'A':14,
 	'K':13,
 	'Q':12,
-	'J':11,
+	#'J':11,
 	'T':10,
 	'9':9,
 	'8':8,
@@ -77,14 +101,105 @@ CARD_VALUES = {
 	'4':4,
 	'3':3,
 	'2':2,
-	'1':1	
+	'1':1,
+	'J':0 # new rule: J means Joker, and has the weakest value
 }
+
+def getValueFromType(hand):
+	"""
+	Returns a 1-digit number representing the value of a hand of cards.		
+	 	To determine which Type of hand we have, we don't care about what the actual cards are;
+	 	we only care about how many-of-a-kind we have of different cards.
+	 	For example, it doesn't matter what values the cards in the hand 2A2A2, it matters that we have 3 of a card and 2 of another card.
+	"""
+	cardTypesFound = []
+	jokersFound = 0
+	
+	# sort hand so identical cards are grouped together
+	orderedHand = sorted(hand)
+			
+	cardIndex = 0
+	while cardIndex < len(orderedHand):
+		character = orderedHand[cardIndex]
+		chainLength = 1
+		# peek to the right to see if there are more of this card
+		while (
+			cardIndex + chainLength < len(orderedHand)
+			and orderedHand[cardIndex + chainLength] == character
+				):
+			# found another card like this one, increment and keep checking
+			chainLength += 1
+		
+		if character == 'J':
+			# special rules for Jokers; set them aside for later, when they'll be used to boost other chains
+			jokersFound = chainLength
+		else:
+			# record the number of the same card that we found
+			cardTypesFound.append(chainLength)
+
+		# progress to the next kind of card
+		cardIndex += chainLength
+
+	# sort chains so the longest chains are first
+	cardTypesFound.sort(reverse=True)
+
+	# Jokers group with whatever cards will make the strongest hand, which means they always group with whatever card there is already the most of.
+	if jokersFound == 5:
+		cardTypesFound.append(5)
+	elif jokersFound > 0:
+		cardTypesFound[0] += jokersFound
+
+	print(f"Chains:  {cardTypesFound}")
+
+	# At last, we are actually prepared to determine the hand type
+	if cardTypesFound[0] == 5:
+		# Five-of-a-Kind
+		typeValue = 7
+	elif cardTypesFound[0] == 4:
+		# Four-of-a-Kind
+		typeValue = 6
+	elif cardTypesFound[0] == 3:
+		if cardTypesFound[1] == 2:
+			# Full House
+			typeValue = 5
+		else:		
+			# Three-of-a-Kind
+			typeValue = 4
+	elif cardTypesFound[0] == 2:
+		if cardTypesFound[1] == 2:
+			# Two Pair
+			typeValue = 3
+		else:		
+			# One Pair
+			typeValue = 2
+	else:
+		# High Card
+		typeValue = 1
+
+	return typeValue
+
+
+def getValueFromCards(hand):
+	"""
+	Returns a 10-digit number representing the value of this hand of cards.
+	 	We'll make a 10-digit number, and each set of 2 digits in it will be the value of the card in that spot.
+	 	For example, the cards in Q12TA have values of 12, 01, 02, 10, and 14 respectively, so the hand value is 1201021014.
+		Remember: order matters!		
+	"""
+	totalValue = 0
+	multiplier = 100**4
+	for card in hand:
+		value = CARD_VALUES.get(card)
+		totalValue += value * multiplier
+		multiplier //= 100
+	
+	return totalValue
+
 
 with open(INPUT_FILE, 'r') as dataRows:
 
 	handList = []
 	for line in dataRows:
-
 		hand, betAmount = line.split()
 		
 		# Since all we need to do is rank hands relative to other hands, our goal is to sort these hands.
@@ -96,74 +211,12 @@ with open(INPUT_FILE, 'r') as dataRows:
 		#	dd - represents the value of card 3
 		#	EE - represents the value of card 4
 		#	ff - represents the value of card 5
+		typeValue = getValueFromType(hand)
 
-		# Determine hand type		
-		# 	To determine which Type of hand we have, we don't care about what the actual cards are;
-		# 	we only care about how many-of-a-kind we have of different cards.
-		# 	For example, it doesn't matter what values the cards in the hand 2A2A2, it matters that we have 3 of a card and 2 of another card.
-		cardTypesFound = []
-		
-		# sort hand so identical cards are grouped together
-		orderedHand = sorted(hand)
-				
-		cardIndex = 0
-		while cardIndex < len(orderedHand):
-			character = orderedHand[cardIndex]
-			chainLength = 1
-			# peek to the right to see if there are more of this card
-			while (
-				cardIndex + chainLength < len(orderedHand)
-			    and orderedHand[cardIndex + chainLength] == character
-				  ):
-				# found another card like this one, increment and keep checking
-				chainLength += 1
-			# record the number of the same card that we found
-			cardTypesFound.append(chainLength)
+		cardValue = getValueFromCards(hand)
+		# place typeValue in the highest digit of our 11-digit score		
+		handScore = (typeValue * 10**10) + cardValue
 
-			# progress to the next kind of card
-			cardIndex += chainLength
-
-		# sort chains so the longest chains are first
-		cardTypesFound.sort(reverse=True)
-		print(f"Chains:  {cardTypesFound}")
-
-		# At last, we are actually prepared to determine the hand type
-		if cardTypesFound[0] == 5:
-			# Five-of-a-Kind
-			typeValue = 7
-		elif cardTypesFound[0] == 4:
-			# Four-of-a-Kind
-			typeValue = 6
-		elif cardTypesFound[0] == 3:
-			if cardTypesFound[1] == 2:
-				# Full House
-				typeValue = 5
-			else:		
-				# Three-of-a-Kind
-				typeValue = 4
-		elif cardTypesFound[0] == 2:
-			if cardTypesFound[1] == 2:
-				# Two Pair
-				typeValue = 3
-			else:		
-				# One Pair
-				typeValue = 2
-		else:
-			# High Card
-			typeValue = 1
-
-		# place typeValue in the highest digit of our 11-digit score
-		handScore = typeValue * 10**10
-
-		# Determine value of cards
-		# 	We'll make a 10-digit number, and each set of 2 digits in it will be the value of the card in that spot.
-		# 	For example, the cards in Q12TA have values of 12, 01, 02, 10, and 14 respectively, so the hand value is 1201021014.
-		#	Remember: order matters!		
-		multiplier = 100**4
-		for card in hand:
-			value = CARD_VALUES.get(card)
-			handScore += value * multiplier
-			multiplier //= 100
 		print(f"Hand:  {hand:>11}")
 		print(f"Score: {handScore:>11}")
 		print()
